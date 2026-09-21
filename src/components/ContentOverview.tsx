@@ -1,3 +1,3 @@
 import styles from '../dashboard.module.css';
+import PanelHeading from './PanelHeading';
 export default function ContentOverview() { return <section className={styles.panel}><PanelHeading title="Content overview" sub="Performance across your posts" right="7 days　 30 days"/><div className={styles.legend}><span>● Views</span><span>● Engagement</span></div><div className={styles.chart}><div className={styles.chartLines}/><div className={styles.chartFill}/><div className={styles.chartLine}/><div className={styles.days}><span>Sep 16</span><span>Sep 17</span><span>Sep 18</span><span>Sep 19</span><span>Sep 20</span><span>Sep 21</span><span>Today</span></div></div></section>; }
-export function PanelHeading({ title, sub, right }: { title: string; sub: string; right: string }) { return <div className={styles.heading}><div><h2>{title}</h2><p>{sub}</p></div><button>{right}</button></div>; }

@@ -1,3 +1,3 @@
 import styles from '../dashboard.module.css';
-import { PanelHeading } from './ContentOverview';
+import PanelHeading from './PanelHeading';
 export default function TopPost() { return <section className={styles.panel}><PanelHeading title="Top performing post" sub="Your content is resonating" right="•••"/><div className={styles.post}><div className={styles.postArt}>THE<br/><b>QUIET</b><br/>REVOLUTION<small>notes on designing<br/>for attention</small></div><div><label>DESIGN & CULTURE</label><h2>The future of calm interfaces</h2><p>How we can create digital spaces that respect our attention and help us do our best work.</p><small>♡ 1,284　 ◌ 86　 3 min read</small></div></div></section>; }
