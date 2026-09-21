@@ -1,6 +1,7 @@
-import type { Activity, NavItem, Stat } from '../components/types';
+import type { Activity, NavItem, Order, Stat } from '../components/types';
 
 export const navItems: NavItem[] = [['▦', 'Overview'], ['◉', 'Explore'], ['▱', 'My Content'], ['✎', 'Create Post'], ['♧', 'Community']].map(([icon, label]) => ({ icon, label }));
 export const manageItems: NavItem[] = [['♧', 'Notifications'], ['⌕', 'Search'], ['▱', 'My Files'], ['▣', 'Store']].map(([icon, label]) => ({ icon, label }));
 export const stats: Stat[] = [{ icon: '✎', label: 'Total posts', value: '248', trend: '↗ 12.5%' }, { icon: '♧', label: 'Community reach', value: '12.8k', trend: '↗ 8.2%' }, { icon: '♡', label: 'Engagement', value: '4.62k', trend: '↗ 18.4%' }, { icon: '▣', label: 'Store revenue', value: '$2,840', trend: '— 0.8%' }];
 export const activities: Activity[] = [{ icon: '♥', title: 'Alexander liked your post', detail: 'The future of calm interfaces', time: '12 min ago' }, { icon: '◌', title: 'Mia commented on your post', detail: '“This is such a thoughtful take.”', time: '38 min ago' }, { icon: '▣', title: 'Order #NX-2084 shipped', detail: 'Your order is on the way', time: '2 hrs ago' }, { icon: '◈', title: 'Security check completed', detail: 'No unusual activity detected', time: 'Yesterday' }];
+export const orders: Order[] = [{ name: 'NEXUS Field Notes', price: '$32.00', id: '#NX-2084 · Sep 21', status: 'Shipped' }, { name: 'Digital Workspace Kit', price: '$18.00', id: '#NX-2081 · Sep 19', status: 'Delivered' }, { name: 'Focus Soundscapes', price: '$12.00', id: '#NX-2078 · Sep 17', status: 'Delivered' }];
