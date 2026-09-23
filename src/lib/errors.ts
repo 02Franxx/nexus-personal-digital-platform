@@ -7,6 +7,16 @@ export type ErrorCode =
   | 'RATE_LIMITED'
   | 'INTERNAL_ERROR';
 
+const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  RATE_LIMITED: 429,
+  INTERNAL_ERROR: 500,
+};
+
 export class AppError extends Error {
   public readonly code: ErrorCode;
   public readonly statusCode: number;
@@ -14,12 +24,11 @@ export class AppError extends Error {
   constructor(
     code: ErrorCode,
     message: string,
-    statusCode: number,
   ) {
     super(message);
 
     this.name = 'AppError';
     this.code = code;
-    this.statusCode = statusCode;
+    this.statusCode = ERROR_STATUS_MAP[code];
   }
 }
