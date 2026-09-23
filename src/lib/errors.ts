@@ -32,3 +32,37 @@ export class AppError extends Error {
     this.statusCode = ERROR_STATUS_MAP[code];
   }
 }
+
+export type HttpErrorResponse = {
+  statusCode: number;
+  body: {
+    error: {
+      code: ErrorCode;
+      message: string;
+    };
+  };
+};
+
+export function toHttpErrorResponse(error: unknown): HttpErrorResponse {
+  if (error instanceof AppError) {
+    return {
+      statusCode: error.statusCode,
+      body: {
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      },
+    };
+  }
+
+  return {
+    statusCode: 500,
+    body: {
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An unexpected error occurred.',
+      },
+    },
+  };
+}
