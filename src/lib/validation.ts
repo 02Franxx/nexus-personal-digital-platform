@@ -48,3 +48,10 @@ export function parseCommentInput(input: unknown): CommentInput {
 export const notificationReadSchema = z.object({
   notificationId: z.string().min(1),
 }).strict();
+
+export const fileMetadataSchema = z.object({
+  storageKey: z.string().trim().min(1).max(512),
+  name: z.string().trim().min(1).max(255),
+  mimeType: z.string().trim().min(1).max(128),
+  sizeBytes: z.number().int().positive().max(100 * 1024 * 1024),
+}).strict();

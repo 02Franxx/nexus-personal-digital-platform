@@ -24,6 +24,7 @@ model User {
   comments     Comment[]
   notifications Notification[]
   auditLogs    AuditLog[]
+  files        FileRecord[]
 
   @@index([createdAt])
 }
@@ -91,5 +92,18 @@ model AuditLog {
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([action, createdAt])
+  @@index([userId, createdAt])
+}
+
+model FileRecord {
+  id         String   @id @default(cuid())
+  storageKey String   @unique
+  name       String
+  mimeType   String
+  sizeBytes  Int
+  userId     String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, createdAt])
 }
