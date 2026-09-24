@@ -14,15 +14,20 @@ function allowedOrigins(): Set<string> {
 export function middleware(request: NextRequest) {
   if (!request.nextUrl.pathname.startsWith('/api/')) return NextResponse.next();
 
+  const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID();
+
   const origin = request.headers.get('origin');
   if (origin && !allowedOrigins().has(origin)) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: { code: 'FORBIDDEN', message: 'Origin is not allowed.' } },
       { status: 403, headers: { Vary: 'Origin' } },
     );
+    response.headers.set('X-Request-ID', requestId);
+    return response;
   }
 
   const response = NextResponse.next();
+  response.headers.set('X-Request-ID', requestId);
   response.headers.set('Vary', 'Origin');
   if (origin) {
     response.headers.set('Access-Control-Allow-Origin', origin);
