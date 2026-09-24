@@ -10,8 +10,17 @@ export const loginSchema = z.object({
   password: passwordSchema,
 }).strict();
 
+export const registerSchema = loginSchema.extend({
+  displayName: z.string().trim().min(1).max(80),
+}).strict();
+
 export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
 
 export function parseLoginInput(input: unknown): LoginInput {
   return loginSchema.parse(input);
+}
+
+export function parseRegisterInput(input: unknown): RegisterInput {
+  return registerSchema.parse(input);
 }
