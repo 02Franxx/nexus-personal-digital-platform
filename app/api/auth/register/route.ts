@@ -7,11 +7,13 @@ import { db } from '../../../../src/lib/db';
 import { hashPassword } from '../../../../src/lib/auth/password';
 import { parseRegisterInput } from '../../../../src/lib/validation';
 import { recordAuditLog } from '../../../../src/lib/audit';
+import { assertRateLimit } from '../../../../src/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    assertRateLimit(`register:${request.headers.get('x-forwarded-for') ?? 'unknown'}`);
     const input = parseRegisterInput(await request.json());
     const passwordHash = await hashPassword(input.password);
     const user = await db.user.create({

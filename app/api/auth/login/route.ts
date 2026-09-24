@@ -6,11 +6,13 @@ import { db } from '../../../../src/lib/db';
 import { verifyPassword } from '../../../../src/lib/auth/password';
 import { parseLoginInput } from '../../../../src/lib/validation';
 import { createSession } from '../../../../src/lib/auth/session';
+import { assertRateLimit } from '../../../../src/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    assertRateLimit(`login:${request.headers.get('x-forwarded-for') ?? 'unknown'}`);
     const input = parseLoginInput(await request.json());
     const user = await db.user.findUnique({
       where: { email: input.email.toLowerCase() },
