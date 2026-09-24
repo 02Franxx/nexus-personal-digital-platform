@@ -5,6 +5,7 @@ import { errorResponse, jsonOk } from '../../../../src/lib/http';
 import { db } from '../../../../src/lib/db';
 import { verifyPassword } from '../../../../src/lib/auth/password';
 import { parseLoginInput } from '../../../../src/lib/validation';
+import { createSession } from '../../../../src/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,8 @@ export async function POST(request: NextRequest) {
     if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
       return errorResponse(new AppError('UNAUTHORIZED', 'Invalid email or password.'));
     }
+
+    await createSession(user.id);
 
     return jsonOk({
       data: {
