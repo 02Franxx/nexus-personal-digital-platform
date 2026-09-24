@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:security": "node --test tests/security-errors.test.mjs tests/password.test.mjs"
+    "test:security": "node --test tests/security-errors.test.mjs tests/password.test.mjs",
+    "db:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
