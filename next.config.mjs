@@ -2,6 +2,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   async headers() {
     const scriptSources = ["'self'", "'unsafe-inline'"];
     if (isDevelopment) scriptSources.push("'unsafe-eval'");
