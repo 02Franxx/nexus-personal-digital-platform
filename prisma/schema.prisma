@@ -23,6 +23,7 @@ model User {
   posts        Post[]
   comments     Comment[]
   notifications Notification[]
+  auditLogs    AuditLog[]
 
   @@index([createdAt])
 }
@@ -77,4 +78,18 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  userId    String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([action, createdAt])
+  @@index([userId, createdAt])
 }

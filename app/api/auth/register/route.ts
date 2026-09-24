@@ -6,6 +6,7 @@ import { errorResponse, jsonOk } from '../../../../src/lib/http';
 import { db } from '../../../../src/lib/db';
 import { hashPassword } from '../../../../src/lib/auth/password';
 import { parseRegisterInput } from '../../../../src/lib/validation';
+import { recordAuditLog } from '../../../../src/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
       },
       select: { id: true, email: true, displayName: true, role: true },
     });
+    await recordAuditLog({ action: 'USER_REGISTERED', entity: 'User', entityId: user.id, userId: user.id });
 
     return jsonOk({ data: { user } }, 201);
   } catch (error) {
