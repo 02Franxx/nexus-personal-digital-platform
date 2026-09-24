@@ -30,3 +30,25 @@ export async function destroySession(): Promise<void> {
   if (token) await db.session.deleteMany({ where: { tokenHash: hashToken(token) } });
   cookieStore.delete(COOKIE_NAME);
 }
+
+export async function getCurrentUser() {
+  const token = (await cookies()).get(COOKIE_NAME)?.value;
+  if (!token) return null;
+
+  const session = await db.session.findUnique({
+    where: { tokenHash: hashToken(token) },
+    include: { user: true },
+  });
+
+  if (!session || session.expiresAt <= new Date()) {
+    if (session) await db.session.delete({ where: { id: session.id } });
+    return null;
+  }
+
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    displayName: session.user.displayName,
+    role: session.user.role,
+  };
+}
