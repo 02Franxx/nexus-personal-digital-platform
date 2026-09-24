@@ -44,3 +44,7 @@ export function parsePostInput(input: unknown): PostInput {
 export function parseCommentInput(input: unknown): CommentInput {
   return commentSchema.parse(input);
 }
+
+export const notificationReadSchema = z.object({
+  notificationId: z.string().min(1),
+}).strict();
