@@ -69,3 +69,8 @@ export const passwordChangeSchema = z.object({
   currentPassword: passwordSchema,
   newPassword: passwordSchema,
 }).strict();
+
+export const accountDeleteSchema = z.object({
+  password: passwordSchema,
+  confirmation: z.literal('DELETE_ACCOUNT'),
+}).strict();
