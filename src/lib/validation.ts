@@ -14,8 +14,15 @@ export const registerSchema = loginSchema.extend({
   displayName: z.string().trim().min(1).max(80),
 }).strict();
 
+export const postSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  content: z.string().trim().min(1).max(100_000),
+  published: z.boolean().default(false),
+}).strict();
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type PostInput = z.infer<typeof postSchema>;
 
 export function parseLoginInput(input: unknown): LoginInput {
   return loginSchema.parse(input);
@@ -23,4 +30,8 @@ export function parseLoginInput(input: unknown): LoginInput {
 
 export function parseRegisterInput(input: unknown): RegisterInput {
   return registerSchema.parse(input);
+}
+
+export function parsePostInput(input: unknown): PostInput {
+  return postSchema.parse(input);
 }
