@@ -31,6 +31,11 @@ export async function destroySession(): Promise<void> {
   cookieStore.delete(COOKIE_NAME);
 }
 
+export async function destroyUserSessions(userId: string): Promise<void> {
+  await db.session.deleteMany({ where: { userId } });
+  (await cookies()).delete(COOKIE_NAME);
+}
+
 export async function getCurrentUser() {
   const token = (await cookies()).get(COOKIE_NAME)?.value;
   if (!token) return null;
