@@ -1,11 +1,10 @@
-import { NextResponse } from 'next/server';
-import { AppError, toHttpErrorResponse } from '../../../src/lib/errors';
+import { AppError } from '../../../src/lib/errors';
+import { errorResponse } from '../../../src/lib/http';
 
 export async function GET() {
   try {
     throw new AppError('NOT_FOUND', 'Test resource was not found.');
   } catch (error) {
-    const response = toHttpErrorResponse(error);
-    return NextResponse.json(response.body, { status: response.statusCode });
+    return errorResponse(error);
   }
 }
