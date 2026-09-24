@@ -25,6 +25,7 @@ model User {
   notifications Notification[]
   auditLogs    AuditLog[]
   files        FileRecord[]
+  orders       Order[]
 
   @@index([createdAt])
 }
@@ -106,4 +107,25 @@ model FileRecord {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  totalCents Int
+  currency   String      @default("USD")
+  status     OrderStatus @default(PENDING)
+  userId     String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }

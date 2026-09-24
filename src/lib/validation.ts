@@ -55,3 +55,8 @@ export const fileMetadataSchema = z.object({
   mimeType: z.string().trim().min(1).max(128),
   sizeBytes: z.number().int().positive().max(100 * 1024 * 1024),
 }).strict();
+
+export const orderSchema = z.object({
+  totalCents: z.number().int().positive().max(100_000_000),
+  currency: z.string().trim().length(3).toUpperCase().default('USD'),
+}).strict();
