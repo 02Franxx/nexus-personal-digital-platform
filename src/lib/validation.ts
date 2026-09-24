@@ -60,3 +60,7 @@ export const orderSchema = z.object({
   totalCents: z.number().int().positive().max(100_000_000),
   currency: z.string().trim().length(3).toUpperCase().default('USD'),
 }).strict();
+
+export const profileUpdateSchema = z.object({
+  displayName: z.string().trim().min(1).max(80),
+}).strict();
