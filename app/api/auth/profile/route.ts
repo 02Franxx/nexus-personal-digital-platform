@@ -9,9 +9,13 @@ import { recordAuditLog } from '../../../../src/lib/audit';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
-  return NextResponse.json({ data: { user } });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
+    return NextResponse.json({ data: { user } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load the profile.'));
+  }
 }
 
 export async function PATCH(request: NextRequest) {
