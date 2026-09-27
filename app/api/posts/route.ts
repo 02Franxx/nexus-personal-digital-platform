@@ -7,14 +7,20 @@ import { parsePostInput } from '../../../src/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rawLimit = Number(request.nextUrl.searchParams.get('limit') ?? '20');
+  const limit = Number.isInteger(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 20;
+  const cursor = request.nextUrl.searchParams.get('cursor');
   const posts = await db.post.findMany({
     where: { published: true },
     orderBy: { createdAt: 'desc' },
-    take: 50,
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     select: { id: true, title: true, content: true, createdAt: true, author: { select: { id: true, displayName: true } } },
   });
-  return NextResponse.json({ data: { posts } });
+  const hasMore = posts.length > limit;
+  const visiblePosts = hasMore ? posts.slice(0, limit) : posts;
+  return NextResponse.json({ data: { posts: visiblePosts, nextCursor: hasMore ? visiblePosts.at(-1)?.id ?? null : null } });
 }
 
 export async function POST(request: NextRequest) {
