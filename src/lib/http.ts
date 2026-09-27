@@ -6,7 +6,8 @@ import { toHttpErrorResponse } from './errors';
 /** Convert an unknown route error into the public NEXUS API error contract. */
 export function errorResponse(error: unknown): NextResponse {
   const response = toHttpErrorResponse(error);
-  return NextResponse.json(response.body, { status: response.statusCode });
+  const headers = response.statusCode === 429 ? { 'Retry-After': '60' } : undefined;
+  return NextResponse.json(response.body, { status: response.statusCode, headers });
 }
 
 export function jsonOk<T>(data: T, status = 200): NextResponse<T> {
