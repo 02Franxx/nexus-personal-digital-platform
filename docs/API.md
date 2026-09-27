@@ -40,7 +40,7 @@ HttpOnly `nexus_session` cookie.
 - `POST /api/posts/:id/share` — record an allowlisted share channel for a published post; anonymous shares are supported.
 - `GET/PATCH /api/notifications` — current-user notifications and read state. PATCH accepts a notification ID for one item or `{}` to mark all as read.
 - `GET/POST /api/files` — current-user file metadata; storage adapters are external. Metadata enforces an allowlisted MIME type, matching extension, safe filename/storage key, and a 100 MB size limit.
-- `GET/POST /api/orders` — current-user order list and pending order creation. POST accepts an optional `Idempotency-Key` header (max 128 characters) and replays the original order for a duplicate key.
+- `GET/POST /api/orders` — current-user order list and pending order creation. POST accepts an optional `Idempotency-Key` header (max 128 characters), replays matching duplicate requests, and returns `409` when a key is reused with different order data.
 
 ## Administration
 

@@ -166,6 +166,7 @@ model Order {
   totalCents Int
   currency   String      @default("USD")
   idempotencyKey String?
+  idempotencyFingerprint String?
   status     OrderStatus @default(PENDING)
   userId     String
   createdAt  DateTime    @default(now())
