@@ -50,11 +50,25 @@ export const notificationReadSchema = z.object({
 }).strict();
 
 export const fileMetadataSchema = z.object({
-  storageKey: z.string().trim().min(1).max(512),
-  name: z.string().trim().min(1).max(255),
-  mimeType: z.string().trim().min(1).max(128),
+  storageKey: z.string().trim().min(1).max(512).refine((value) => !value.startsWith('/') && !value.includes('\\') && !value.split('/').includes('..'), 'Invalid storage key.'),
+  name: z.string().trim().min(1).max(255).refine((value) => !value.includes('/') && !value.includes('\\') && value !== '.' && value !== '..', 'Invalid file name.'),
+  mimeType: z.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain', 'application/zip']),
   sizeBytes: z.number().int().positive().max(100 * 1024 * 1024),
-}).strict();
+}).strict().superRefine((value, context) => {
+  const extension = value.name.split('.').pop()?.toLowerCase();
+  const expectedExtensions: Record<string, string[]> = {
+    'image/jpeg': ['jpg', 'jpeg'],
+    'image/png': ['png'],
+    'image/gif': ['gif'],
+    'image/webp': ['webp'],
+    'application/pdf': ['pdf'],
+    'text/plain': ['txt'],
+    'application/zip': ['zip'],
+  };
+  if (!extension || !expectedExtensions[value.mimeType].includes(extension)) {
+    context.addIssue({ code: 'custom', path: ['name'], message: 'File extension does not match MIME type.' });
+  }
+});
 
 export const orderSchema = z.object({
   totalCents: z.number().int().positive().max(100_000_000),

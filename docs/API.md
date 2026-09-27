@@ -34,7 +34,7 @@ HttpOnly `nexus_session` cookie.
 - `GET/POST /api/posts/:id/comments` — list and authenticated creation.
 - `DELETE /api/posts/:id/comments/:commentId` — delete by comment author or admin.
 - `GET/PATCH /api/notifications` — current-user notifications and read state.
-- `GET/POST /api/files` — current-user file metadata; storage adapters are external.
+- `GET/POST /api/files` — current-user file metadata; storage adapters are external. Metadata enforces an allowlisted MIME type, matching extension, safe filename/storage key, and a 100 MB size limit.
 - `GET/POST /api/orders` — current-user order list and pending order creation.
 
 ## Administration

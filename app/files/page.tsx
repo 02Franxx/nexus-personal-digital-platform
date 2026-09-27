@@ -7,7 +7,7 @@ type FileRecord = { id: string; name: string; mimeType: string; sizeBytes: numbe
 
 export default function FilesPage() {
   const [files, setFiles] = useState<FileRecord[]>([]);
-  const [form, setForm] = useState({ name: '', mimeType: 'application/octet-stream', sizeBytes: '', storageKey: '' });
+  const [form, setForm] = useState({ name: '', mimeType: 'application/pdf', sizeBytes: '', storageKey: '' });
   const [message, setMessage] = useState('');
 
   async function load() {
@@ -23,7 +23,7 @@ export default function FilesPage() {
     const response = await fetch('/api/files', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, sizeBytes: Number(form.sizeBytes) }) });
     const payload = await response.json();
     if (!response.ok) { setMessage(payload.error?.message ?? 'Unable to register file.'); return; }
-    setMessage('File metadata registered.'); setForm({ name: '', mimeType: 'application/octet-stream', sizeBytes: '', storageKey: '' }); await load();
+    setMessage('File metadata registered.'); setForm({ name: '', mimeType: 'application/pdf', sizeBytes: '', storageKey: '' }); await load();
   }
 
   return <main style={{ maxWidth: 760, margin: '4rem auto', padding: '2rem' }}><p><Link href="/">← Back to workspace</Link></p><h1>Files</h1>
