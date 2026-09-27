@@ -13,6 +13,24 @@ test('AppError preserves the public API contract and mapped status', () => {
   });
 });
 
+test('every public error code maps to its intended HTTP status', () => {
+  const expected = {
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    CONFLICT: 409,
+    RATE_LIMITED: 429,
+    INTERNAL_ERROR: 500,
+  };
+
+  for (const [code, statusCode] of Object.entries(expected)) {
+    const response = toHttpErrorResponse(new AppError(code, `${code} message`));
+    assert.equal(response.statusCode, statusCode);
+    assert.equal(response.body.error.code, code);
+  }
+});
+
 test('unknown errors are sanitized before leaving the server', () => {
   const response = toHttpErrorResponse(new Error('SECRET DATABASE ERROR'));
   assert.equal(response.statusCode, 500);
