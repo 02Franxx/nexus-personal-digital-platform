@@ -27,11 +27,11 @@ export async function PATCH(request: NextRequest) {
     if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
     const { notificationId } = notificationReadSchema.parse(await request.json());
     const result = await db.notification.updateMany({
-      where: { id: notificationId, userId: user.id },
+      where: { userId: user.id, ...(notificationId ? { id: notificationId } : { readAt: null }) },
       data: { readAt: new Date() },
     });
-    if (result.count === 0) return errorResponse(new AppError('NOT_FOUND', 'Notification not found.'));
-    return NextResponse.json({ data: { read: true } });
+    if (notificationId && result.count === 0) return errorResponse(new AppError('NOT_FOUND', 'Notification not found.'));
+    return NextResponse.json({ data: { read: true, count: result.count } });
   } catch (error) {
     if (error instanceof AppError) return errorResponse(error);
     return errorResponse(new AppError('BAD_REQUEST', 'Invalid notification request.'));

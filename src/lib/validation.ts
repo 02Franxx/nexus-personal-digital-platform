@@ -46,7 +46,7 @@ export function parseCommentInput(input: unknown): CommentInput {
 }
 
 export const notificationReadSchema = z.object({
-  notificationId: z.string().min(1),
+  notificationId: z.string().min(1).optional(),
 }).strict();
 
 export const fileMetadataSchema = z.object({
