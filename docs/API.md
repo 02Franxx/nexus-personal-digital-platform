@@ -22,6 +22,7 @@ HttpOnly `nexus_session` cookie.
 - `GET /api/auth/me` — return the current user or `null`.
 - `GET/PATCH /api/auth/profile` — read/update display name.
 - `PATCH /api/auth/password` — rotate password and revoke sessions.
+- `GET/DELETE /api/auth/sessions` — list active sessions or revoke all sessions.
 - `DELETE /api/auth/account` — password-confirmed account deletion.
 
 ## Product domains
