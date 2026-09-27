@@ -46,6 +46,9 @@ Binary upload execution is intentionally disabled until an S3-compatible
 provider is configured through a server-side adapter. Metadata registration is
 not proof that the binary exists in object storage.
 
+Email delivery is also adapter-based. Registration and password-recovery email
+flows must not be enabled until an SMTP/provider adapter is configured.
+
 ## Operational headers
 
 API responses include `X-Request-ID` for correlation. Origins are controlled by
