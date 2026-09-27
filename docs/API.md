@@ -27,7 +27,8 @@ HttpOnly `nexus_session` cookie.
 
 ## Product domains
 
-- `GET/POST /api/posts` — public list and authenticated creation. `GET` accepts
+- `GET/POST /api/posts` — public list and authenticated creation. Posts support
+  optional categories and up to 10 tags. `GET` accepts
   `limit` (1–50, default 20), `cursor`, and `q` (case-insensitive title/body
   search); paginated responses return `data.nextCursor` or `null`.
 - `GET/PATCH/DELETE /api/posts/:id` — published reads and owner/admin changes.

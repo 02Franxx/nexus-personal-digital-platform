@@ -17,6 +17,8 @@ export const registerSchema = loginSchema.extend({
 export const postSchema = z.object({
   title: z.string().trim().min(1).max(160),
   content: z.string().trim().min(1).max(100_000),
+  category: z.string().trim().max(80).optional(),
+  tags: z.array(z.string().trim().min(1).max(30)).max(10).default([]),
   published: z.boolean().default(false),
 }).strict();
 
