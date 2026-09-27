@@ -35,6 +35,7 @@ HttpOnly `nexus_session` cookie.
 - `DELETE /api/posts/:id/comments/:commentId` — delete by comment author or admin.
 - `GET/POST/DELETE /api/posts/:id/like` — read like state/count or like/unlike a published post.
 - `GET/POST/DELETE /api/posts/:id/favorite` — read or update the authenticated user's saved-post state.
+- `GET /api/favorites` — list the authenticated user's saved published posts.
 - `GET/PATCH /api/notifications` — current-user notifications and read state. PATCH accepts a notification ID for one item or `{}` to mark all as read.
 - `GET/POST /api/files` — current-user file metadata; storage adapters are external. Metadata enforces an allowlisted MIME type, matching extension, safe filename/storage key, and a 100 MB size limit.
 - `GET/POST /api/orders` — current-user order list and pending order creation.

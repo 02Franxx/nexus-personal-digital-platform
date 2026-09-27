@@ -58,7 +58,7 @@ export default function PostsPage() {
 
   return (
     <main style={{ maxWidth: 760, margin: '4rem auto', padding: '2rem' }}>
-      <p><Link href="/">← Back to workspace</Link></p>
+      <p><Link href="/">← Back to workspace</Link> · <Link href="/favorites">Saved posts</Link></p>
       <h1>Posts</h1>
       <form onSubmit={submitSearch} style={{ display: 'flex', gap: '0.5rem', margin: '1rem 0 2rem' }}>
         <input aria-label="Search posts" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search posts" />
