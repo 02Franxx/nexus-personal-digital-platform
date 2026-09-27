@@ -23,13 +23,22 @@ export async function POST(request: NextRequest, context: Context) {
     const user = await getCurrentUser();
     if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
     const { id } = await context.params;
-    const post = await db.post.findUnique({ where: { id }, select: { id: true, published: true } });
+    const post = await db.post.findUnique({ where: { id }, select: { id: true, published: true, authorId: true } });
     if (!post || !post.published) return errorResponse(new AppError('NOT_FOUND', 'Post not found.'));
     const input = parseCommentInput(await request.json());
     const comment = await db.comment.create({
       data: { ...input, postId: id, authorId: user.id },
       select: { id: true, content: true, createdAt: true, author: { select: { id: true, displayName: true } } },
     });
+    if (post.authorId !== user.id) {
+      await db.notification.create({
+        data: {
+          userId: post.authorId,
+          type: 'POST_COMMENTED',
+          message: `${user.displayName ?? user.email} commented on your post.`,
+        },
+      });
+    }
     return NextResponse.json({ data: { comment } }, { status: 201 });
   } catch (error) {
     if (error instanceof AppError) return errorResponse(error);
