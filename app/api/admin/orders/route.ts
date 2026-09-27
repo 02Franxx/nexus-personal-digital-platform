@@ -42,11 +42,14 @@ export async function PATCH(request: NextRequest) {
     const orderId = request.nextUrl.searchParams.get('orderId');
     if (!orderId) throw new AppError('BAD_REQUEST', 'orderId is required.');
     const { status } = orderStatusSchema.parse(await request.json());
-    const existing = await db.order.findUnique({ where: { id: orderId }, select: { status: true } });
+    const existing = await db.order.findUnique({ where: { id: orderId }, select: { status: true, userId: true } });
     if (!existing) throw new AppError('NOT_FOUND', 'Order not found.');
     if (!allowedTransitions[existing.status].includes(status)) throw new AppError('CONFLICT', `Cannot transition order from ${existing.status} to ${status}.`);
     const order = await db.order.update({ where: { id: orderId }, data: { status } });
-    await recordAuditLog({ action: 'ORDER_STATUS_CHANGED', entity: 'Order', entityId: order.id, userId: admin.id, metadata: { status } });
+    await Promise.all([
+      recordAuditLog({ action: 'ORDER_STATUS_CHANGED', entity: 'Order', entityId: order.id, userId: admin.id, metadata: { status } }),
+      existing.status !== status ? db.notification.create({ data: { userId: existing.userId, type: 'ORDER_STATUS_CHANGED', message: `Your order ${order.id} is now ${status.toLowerCase()}.` } }) : Promise.resolve(),
+    ]);
     return NextResponse.json({ data: { order } });
   } catch (error) {
     if (error instanceof AppError) return errorResponse(error);
