@@ -20,6 +20,6 @@ export default function AdminPage() {
   return <main style={{ maxWidth: 900, margin: '4rem auto', padding: '2rem' }}><p><Link href="/">← Back to workspace</Link></p><h1>Admin overview</h1>
     {message && <p role="alert">{message}</p>}
     {stats && <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>{Object.entries(stats).map(([label, value]) => <article key={label} style={{ border: '1px solid #ddd', padding: '1rem' }}><strong>{label}</strong><p style={{ fontSize: '2rem', margin: 0 }}>{value}</p></article>)}</section>}
-    <nav style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}><Link href="/admin/users">Users</Link><Link href="/admin/orders">Orders</Link><Link href="/admin/audit">Audit log</Link><Link href="/notifications">Notifications</Link><Link href="/settings/profile">Profile</Link></nav>
+    <nav style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}><Link href="/admin/users">Users</Link><Link href="/admin/orders">Orders</Link><Link href="/admin/audit">Audit log</Link><Link href="/admin/metrics">Runtime metrics</Link><Link href="/notifications">Notifications</Link><Link href="/settings/profile">Profile</Link></nav>
   </main>;
 }
