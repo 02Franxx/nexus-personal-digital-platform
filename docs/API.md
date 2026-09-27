@@ -32,6 +32,7 @@ HttpOnly `nexus_session` cookie.
   search); paginated responses return `data.nextCursor` or `null`.
 - `GET/PATCH/DELETE /api/posts/:id` — published reads and owner/admin changes.
 - `GET/POST /api/posts/:id/comments` — list and authenticated creation.
+- `DELETE /api/posts/:id/comments/:commentId` — delete by comment author or admin.
 - `GET/PATCH /api/notifications` — current-user notifications and read state.
 - `GET/POST /api/files` — current-user file metadata; storage adapters are external.
 - `GET/POST /api/orders` — current-user order list and pending order creation.
