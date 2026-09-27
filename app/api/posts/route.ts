@@ -12,8 +12,12 @@ export async function GET(request: NextRequest) {
     const rawLimit = Number(request.nextUrl.searchParams.get('limit') ?? '20');
     const limit = Number.isInteger(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 20;
     const cursor = request.nextUrl.searchParams.get('cursor');
+    const query = request.nextUrl.searchParams.get('q')?.trim() ?? '';
     const posts = await db.post.findMany({
-      where: { published: true },
+      where: {
+        published: true,
+        ...(query ? { OR: [{ title: { contains: query, mode: 'insensitive' } }, { content: { contains: query, mode: 'insensitive' } }] } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
