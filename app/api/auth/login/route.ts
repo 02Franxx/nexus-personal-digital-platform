@@ -7,6 +7,7 @@ import { verifyPassword } from '../../../../src/lib/auth/password';
 import { parseLoginInput } from '../../../../src/lib/validation';
 import { createSession } from '../../../../src/lib/auth/session';
 import { assertRateLimit } from '../../../../src/lib/rate-limit';
+import { recordSecurityEvent } from '../../../../src/lib/security-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,10 +20,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
+      recordSecurityEvent({ type: 'LOGIN_FAILED', requestId: request.headers.get('x-request-id') ?? undefined, metadata: { reason: 'invalid_credentials' } });
       return errorResponse(new AppError('UNAUTHORIZED', 'Invalid email or password.'));
     }
 
     await createSession(user.id);
+    recordSecurityEvent({ type: 'LOGIN_SUCCESS', requestId: request.headers.get('x-request-id') ?? undefined, userId: user.id });
 
     return jsonOk({
       data: {

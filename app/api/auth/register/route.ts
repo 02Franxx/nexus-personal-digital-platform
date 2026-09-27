@@ -8,6 +8,7 @@ import { hashPassword } from '../../../../src/lib/auth/password';
 import { parseRegisterInput } from '../../../../src/lib/validation';
 import { recordAuditLog } from '../../../../src/lib/audit';
 import { assertRateLimit } from '../../../../src/lib/rate-limit';
+import { recordSecurityEvent } from '../../../../src/lib/security-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
       select: { id: true, email: true, displayName: true, role: true },
     });
     await recordAuditLog({ action: 'USER_REGISTERED', entity: 'User', entityId: user.id, userId: user.id });
+    recordSecurityEvent({ type: 'LOGIN_SUCCESS', requestId: request.headers.get('x-request-id') ?? undefined, userId: user.id, metadata: { action: 'registration' } });
 
     return jsonOk({ data: { user } }, 201);
   } catch (error) {
