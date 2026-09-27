@@ -6,7 +6,6 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const eslintCli = path.join(root, 'node_modules', 'eslint', 'bin', 'eslint.js');
 const result = spawnSync(process.execPath, [eslintCli, '.'], {
   cwd: root,
-  env: { ...process.env, ESLINT_USE_FLAT_CONFIG: 'false' },
   stdio: 'inherit',
 });
 
