@@ -7,9 +7,13 @@ import { getCurrentUser } from '../../../../src/lib/auth/session';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
-  if (user.role !== 'ADMIN') return errorResponse(new AppError('FORBIDDEN', 'Administrator access is required.'));
-  const logs = await db.auditLog.findMany({ orderBy: { createdAt: 'desc' }, take: 100 });
-  return NextResponse.json({ data: { logs } });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
+    if (user.role !== 'ADMIN') return errorResponse(new AppError('FORBIDDEN', 'Administrator access is required.'));
+    const logs = await db.auditLog.findMany({ orderBy: { createdAt: 'desc' }, take: 100 });
+    return NextResponse.json({ data: { logs } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load audit logs.'));
+  }
 }

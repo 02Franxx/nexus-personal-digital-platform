@@ -9,10 +9,14 @@ import { recordAuditLog } from '../../../src/lib/audit';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
-  const orders = await db.order.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
-  return NextResponse.json({ data: { orders } });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
+    const orders = await db.order.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
+    return NextResponse.json({ data: { orders } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load orders.'));
+  }
 }
 
 export async function POST(request: NextRequest) {

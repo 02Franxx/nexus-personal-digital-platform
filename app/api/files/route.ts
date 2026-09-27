@@ -8,10 +8,14 @@ import { fileMetadataSchema } from '../../../src/lib/validation';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
-  const files = await db.fileRecord.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
-  return NextResponse.json({ data: { files } });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
+    const files = await db.fileRecord.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
+    return NextResponse.json({ data: { files } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load files.'));
+  }
 }
 
 export async function POST(request: NextRequest) {
