@@ -1,0 +1,29 @@
+# Security policy
+
+## Secret handling
+
+Never commit `.env.local`, production secrets, database credentials, payment
+keys, or SMTP passwords. Use `.env.example` and `.env.production.example` as
+templates only.
+
+## Application boundaries
+
+- Secret-reading modules are marked `server-only`.
+- API errors are sanitized before returning to clients.
+- Authentication uses HttpOnly session cookies with hashed server-side tokens.
+- Passwords are bcrypt-hashed and never stored in plaintext.
+- Login and registration have request rate limiting.
+- API origins and security headers are enforced by middleware/configuration.
+- Admin mutations are recorded in audit logs.
+
+## Reporting a vulnerability
+
+Do not open a public issue for an exploitable vulnerability. Contact the
+repository owner privately with reproduction steps, affected commit, impact,
+and a suggested mitigation. Do not include real credentials or personal data.
+
+## Release checks
+
+Before deployment, run `npm run db:validate`, `npm run db:generate`,
+`npm run typecheck`, `npm run test:security`, and `npm run build`. Deploy only
+after migrations and readiness checks succeed in the target environment.
