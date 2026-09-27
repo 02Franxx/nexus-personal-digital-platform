@@ -26,6 +26,7 @@ model User {
   auditLogs    AuditLog[]
   files        FileRecord[]
   orders       Order[]
+  likes        Like[]
 
   @@index([createdAt])
 }
@@ -52,6 +53,7 @@ model Post {
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments  Comment[]
+  likes     Like[]
 
   @@index([authorId, createdAt])
   @@index([published, createdAt])
@@ -67,6 +69,18 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  @@index([postId, createdAt])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
   @@index([postId, createdAt])
 }
 
