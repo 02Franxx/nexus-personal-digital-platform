@@ -8,14 +8,34 @@ type Post = { id: string; title: string; content: string; createdAt: string; aut
 export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState('');
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/posts').then(async (response) => {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error?.message ?? 'Unable to load posts.');
       setPosts(payload.data.posts);
-    }).catch((reason: unknown) => setError(reason instanceof Error ? reason.message : 'Unable to load posts.'));
+      setNextCursor(payload.data.nextCursor);
+    }).catch((reason: unknown) => setError(reason instanceof Error ? reason.message : 'Unable to load posts.'))
+      .finally(() => setLoading(false));
   }, []);
+
+  async function loadMore() {
+    if (!nextCursor) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/posts?cursor=${encodeURIComponent(nextCursor)}`);
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error?.message ?? 'Unable to load more posts.');
+      setPosts((current) => [...current, ...payload.data.posts]);
+      setNextCursor(payload.data.nextCursor);
+    } catch (reason: unknown) {
+      setError(reason instanceof Error ? reason.message : 'Unable to load more posts.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main style={{ maxWidth: 760, margin: '4rem auto', padding: '2rem' }}>
@@ -28,8 +48,9 @@ export default function PostsPage() {
           <p>{post.content}</p>
           <small>{post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small>
         </article>)}
-        {!error && posts.length === 0 && <p>No published posts yet.</p>}
+        {!error && !loading && posts.length === 0 && <p>No published posts yet.</p>}
       </section>
+      {nextCursor && <button type="button" onClick={loadMore} disabled={loading}>{loading ? 'Loading…' : 'Load more'}</button>}
     </main>
   );
 }
