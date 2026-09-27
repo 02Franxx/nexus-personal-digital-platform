@@ -11,6 +11,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState('');
   const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   async function load(id: string) {
     const [postResponse, commentsResponse] = await Promise.all([
@@ -19,6 +20,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
     const postPayload = await postResponse.json();
     const commentsPayload = await commentsResponse.json();
     if (!postResponse.ok) throw new Error(postPayload.error?.message ?? 'Post not found.');
+    if (!commentsResponse.ok) throw new Error(commentsPayload.error?.message ?? 'Unable to load comments.');
     setPost(postPayload.data.post);
     setComments(commentsPayload.data.comments ?? []);
   }
@@ -27,11 +29,18 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
 
   async function submitComment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const { id } = await params;
-    const response = await fetch(`/api/posts/${id}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
-    const payload = await response.json();
-    if (!response.ok) { setMessage(payload.error?.message ?? 'Unable to add comment.'); return; }
-    setContent(''); setMessage(''); await load(id);
+    setSubmitting(true);
+    try {
+      const { id } = await params;
+      const response = await fetch(`/api/posts/${id}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+      const payload = await response.json();
+      if (!response.ok) { setMessage(payload.error?.message ?? 'Unable to add comment.'); return; }
+      setContent(''); setMessage(''); await load(id);
+    } catch (error: unknown) {
+      setMessage(error instanceof Error ? error.message : 'Unable to add comment.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -42,7 +51,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
         <article><h1>{post.title}</h1><p>{post.content}</p><small>By {post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small></article>
         <section style={{ marginTop: '3rem' }}><h2>Comments</h2>
           {comments.map((comment) => <article key={comment.id} style={{ padding: '1rem 0', borderBottom: '1px solid #ddd' }}><p>{comment.content}</p><small>{comment.author.displayName ?? 'NEXUS member'}</small></article>)}
-          <form onSubmit={submitComment} style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}><textarea required rows={4} value={content} onChange={(event) => setContent(event.target.value)} placeholder="Write a comment" /><button type="submit">Comment</button></form>
+          <form onSubmit={submitComment} style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}><textarea required rows={4} value={content} onChange={(event) => setContent(event.target.value)} placeholder="Write a comment" /><button type="submit" disabled={submitting}>{submitting ? 'Posting…' : 'Comment'}</button></form>
           {message && <p role="alert">{message}</p>}
         </section>
       </>}
