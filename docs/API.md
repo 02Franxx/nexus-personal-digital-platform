@@ -53,7 +53,8 @@ flows must not be enabled until an SMTP/provider adapter is configured.
 
 ## Operational headers
 
-API responses include `X-Request-ID` for correlation. Origins are controlled by
+API responses include a server-generated `X-Request-ID` for correlation; client
+values are not trusted. Origins are controlled by
 `NEXUS_ALLOWED_ORIGINS`; secrets are server-only environment variables. API
 responses are marked `Cache-Control: no-store`. Rate-limited responses use
 HTTP `429` and include `Retry-After: 60`.

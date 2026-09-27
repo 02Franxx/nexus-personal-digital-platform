@@ -14,7 +14,8 @@ function allowedOrigins(): Set<string> {
 export function middleware(request: NextRequest) {
   if (!request.nextUrl.pathname.startsWith('/api/')) return NextResponse.next();
 
-  const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID();
+  // Correlation IDs are security/audit metadata; never trust a client-supplied value.
+  const requestId = crypto.randomUUID();
 
   const origin = request.headers.get('origin');
   if (origin && !allowedOrigins().has(origin)) {
