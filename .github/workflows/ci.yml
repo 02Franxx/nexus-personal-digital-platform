@@ -24,6 +24,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Verify lockfile is reproducible
+        run: npm ci --ignore-scripts --dry-run
       - name: Verify application
         run: npm run verify
       - name: Validate container build
