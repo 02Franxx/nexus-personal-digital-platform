@@ -10,13 +10,17 @@ export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, context: Context) {
-  const { id } = await context.params;
-  const post = await db.post.findUnique({
-    where: { id },
-    select: { id: true, title: true, content: true, published: true, createdAt: true, updatedAt: true, author: { select: { id: true, displayName: true } } },
-  });
-  if (!post || !post.published) return errorResponse(new AppError('NOT_FOUND', 'Post not found.'));
-  return NextResponse.json({ data: { post } });
+  try {
+    const { id } = await context.params;
+    const post = await db.post.findUnique({
+      where: { id },
+      select: { id: true, title: true, content: true, published: true, createdAt: true, updatedAt: true, author: { select: { id: true, displayName: true } } },
+    });
+    if (!post || !post.published) return errorResponse(new AppError('NOT_FOUND', 'Post not found.'));
+    return NextResponse.json({ data: { post } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load post.'));
+  }
 }
 
 export async function PATCH(request: NextRequest, context: Context) {
@@ -37,12 +41,17 @@ export async function PATCH(request: NextRequest, context: Context) {
 }
 
 export async function DELETE(_request: NextRequest, context: Context) {
-  const user = await getCurrentUser();
-  if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
-  const { id } = await context.params;
-  const existing = await db.post.findUnique({ where: { id }, select: { authorId: true } });
-  if (!existing) return errorResponse(new AppError('NOT_FOUND', 'Post not found.'));
-  if (existing.authorId !== user.id && user.role !== 'ADMIN') return errorResponse(new AppError('FORBIDDEN', 'You cannot delete this post.'));
-  await db.post.delete({ where: { id } });
-  return NextResponse.json({ data: { deleted: true } });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
+    const { id } = await context.params;
+    const existing = await db.post.findUnique({ where: { id }, select: { authorId: true } });
+    if (!existing) return errorResponse(new AppError('NOT_FOUND', 'Post not found.'));
+    if (existing.authorId !== user.id && user.role !== 'ADMIN') return errorResponse(new AppError('FORBIDDEN', 'You cannot delete this post.'));
+    await db.post.delete({ where: { id } });
+    return NextResponse.json({ data: { deleted: true } });
+  } catch (error) {
+    if (error instanceof AppError) return errorResponse(error);
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to delete post.'));
+  }
 }

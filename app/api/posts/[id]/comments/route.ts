@@ -9,13 +9,17 @@ export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, context: Context) {
-  const { id } = await context.params;
-  const comments = await db.comment.findMany({
-    where: { postId: id },
-    orderBy: { createdAt: 'asc' },
-    select: { id: true, content: true, createdAt: true, author: { select: { id: true, displayName: true } } },
-  });
-  return NextResponse.json({ data: { comments } });
+  try {
+    const { id } = await context.params;
+    const comments = await db.comment.findMany({
+      where: { postId: id },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, content: true, createdAt: true, author: { select: { id: true, displayName: true } } },
+    });
+    return NextResponse.json({ data: { comments } });
+  } catch {
+    return errorResponse(new AppError('INTERNAL_ERROR', 'Unable to load comments.'));
+  }
 }
 
 export async function POST(request: NextRequest, context: Context) {
