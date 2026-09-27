@@ -77,6 +77,7 @@ export const orderSchema = z.object({
 
 export const profileUpdateSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
+  bio: z.string().trim().max(500).optional(),
 }).strict();
 
 export const passwordChangeSchema = z.object({

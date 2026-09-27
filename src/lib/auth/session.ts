@@ -54,6 +54,7 @@ export async function getCurrentUser() {
     id: session.user.id,
     email: session.user.email,
     displayName: session.user.displayName,
+    bio: session.user.bio,
     role: session.user.role,
   };
 }

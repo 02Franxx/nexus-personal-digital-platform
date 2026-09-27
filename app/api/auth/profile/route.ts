@@ -26,7 +26,7 @@ export async function PATCH(request: NextRequest) {
     const updated = await db.user.update({
       where: { id: user.id },
       data: input,
-      select: { id: true, email: true, displayName: true, role: true },
+      select: { id: true, email: true, displayName: true, bio: true, role: true },
     });
     await recordAuditLog({ action: 'PROFILE_UPDATED', entity: 'User', entityId: user.id, userId: user.id });
     return NextResponse.json({ data: { user: updated } });
