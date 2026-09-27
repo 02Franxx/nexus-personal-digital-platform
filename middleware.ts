@@ -23,11 +23,13 @@ export function middleware(request: NextRequest) {
       { status: 403, headers: { Vary: 'Origin' } },
     );
     response.headers.set('X-Request-ID', requestId);
+    response.headers.set('Cache-Control', 'no-store');
     return response;
   }
 
   const response = NextResponse.next();
   response.headers.set('X-Request-ID', requestId);
+  response.headers.set('Cache-Control', 'no-store');
   response.headers.set('Vary', 'Origin');
   if (origin) {
     response.headers.set('Access-Control-Allow-Origin', origin);
