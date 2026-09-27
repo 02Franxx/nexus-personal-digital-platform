@@ -42,6 +42,10 @@ All admin endpoints require an authenticated `ADMIN` role:
 - `GET/PATCH /api/admin/orders`
 - `GET /api/admin/audit-logs`
 
+Binary upload execution is intentionally disabled until an S3-compatible
+provider is configured through a server-side adapter. Metadata registration is
+not proof that the binary exists in object storage.
+
 ## Operational headers
 
 API responses include `X-Request-ID` for correlation. Origins are controlled by
