@@ -16,10 +16,11 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
   const [submitting, setSubmitting] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const [likeState, setLikeState] = useState<LikeState>({ count: 0, liked: false });
+  const [favorited, setFavorited] = useState(false);
 
   async function load(id: string) {
-    const [postResponse, commentsResponse, userResponse, likeResponse] = await Promise.all([
-      fetch(`/api/posts/${id}`), fetch(`/api/posts/${id}/comments`), fetch('/api/auth/me'), fetch(`/api/posts/${id}/like`),
+    const [postResponse, commentsResponse, userResponse, likeResponse, favoriteResponse] = await Promise.all([
+      fetch(`/api/posts/${id}`), fetch(`/api/posts/${id}/comments`), fetch('/api/auth/me'), fetch(`/api/posts/${id}/like`), fetch(`/api/posts/${id}/favorite`),
     ]);
     const postPayload = await postResponse.json();
     const commentsPayload = await commentsResponse.json();
@@ -29,6 +30,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
     setComments(commentsPayload.data.comments ?? []);
     if (userResponse.ok) setCurrentUser((await userResponse.json()).data?.user ?? null);
     if (likeResponse.ok) setLikeState((await likeResponse.json()).data);
+    if (favoriteResponse.ok) setFavorited((await favoriteResponse.json()).data.favorited);
   }
 
   useEffect(() => { void params.then(({ id }) => load(id)).catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Unable to load post.')); }, [params]);
@@ -68,12 +70,21 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
     setLikeState((current) => ({ liked: payload.data.liked, count: current.count + (payload.data.liked ? 1 : -1) }));
   }
 
+  async function toggleFavorite() {
+    if (!currentUser) { setMessage('Sign in to save posts.'); return; }
+    const { id } = await params;
+    const response = await fetch(`/api/posts/${id}/favorite`, { method: favorited ? 'DELETE' : 'POST' });
+    const payload = await response.json();
+    if (!response.ok) { setMessage(payload.error?.message ?? 'Unable to update favorite.'); return; }
+    setFavorited(payload.data.favorited);
+  }
+
   return (
     <main style={{ maxWidth: 760, margin: '4rem auto', padding: '2rem' }}>
       <p><Link href="/posts">← Back to posts</Link></p>
       {message && !post && <p role="alert">{message}</p>}
       {post && <>
-        <article><h1>{post.title}</h1><p>{post.content}</p><small>By {post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small><div><button type="button" onClick={() => void toggleLike()}>{likeState.liked ? 'Unlike' : 'Like'} · {likeState.count}</button></div></article>
+        <article><h1>{post.title}</h1><p>{post.content}</p><small>By {post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small><div><button type="button" onClick={() => void toggleLike()}>{likeState.liked ? 'Unlike' : 'Like'} · {likeState.count}</button><button type="button" onClick={() => void toggleFavorite()} style={{ marginLeft: '0.5rem' }}>{favorited ? 'Remove favorite' : 'Save post'}</button></div></article>
         <section style={{ marginTop: '3rem' }}><h2>Comments</h2>
           {comments.map((comment) => <article key={comment.id} style={{ padding: '1rem 0', borderBottom: '1px solid #ddd' }}><p>{comment.content}</p><small>{comment.author.displayName ?? 'NEXUS member'}</small>{currentUser && (currentUser.role === 'ADMIN' || currentUser.id === comment.author.id) && <button type="button" onClick={() => void deleteComment(comment.id)} style={{ marginLeft: '1rem' }}>Delete</button>}</article>)}
           <form onSubmit={submitComment} style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}><textarea required rows={4} value={content} onChange={(event) => setContent(event.target.value)} placeholder="Write a comment" /><button type="submit" disabled={submitting}>{submitting ? 'Posting…' : 'Comment'}</button></form>
