@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { AppError, toApiErrorBody, toHttpErrorResponse } from '../src/lib/errors.ts';
+import { AppError, retryAfterSeconds, toApiErrorBody, toHttpErrorResponse } from '../src/lib/errors.ts';
 
 test('AppError preserves the public API contract and mapped status', () => {
   const error = new AppError('NOT_FOUND', 'User not found.');
@@ -37,4 +37,10 @@ test('unknown errors are sanitized before leaving the server', () => {
   assert.equal(response.body.error.code, 'INTERNAL_ERROR');
   assert.equal(response.body.error.message, 'An unexpected error occurred.');
   assert.equal(JSON.stringify(response).includes('SECRET DATABASE ERROR'), false);
+});
+
+test('retry delay is only exposed for rate-limited errors', () => {
+  assert.equal(retryAfterSeconds(new AppError('RATE_LIMITED', 'Too many requests.')), 60);
+  assert.equal(retryAfterSeconds(new AppError('UNAUTHORIZED', 'No session.')), null);
+  assert.equal(retryAfterSeconds(new Error('internal')), null);
 });

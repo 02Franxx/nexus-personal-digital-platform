@@ -60,3 +60,8 @@ export function toHttpErrorResponse(error: unknown): HttpErrorResponse {
     body: toApiErrorBody(error),
   };
 }
+
+/** Return a standard retry delay for errors that are safe to retry. */
+export function retryAfterSeconds(error: unknown): number | null {
+  return error instanceof AppError && error.code === 'RATE_LIMITED' ? 60 : null;
+}
