@@ -13,15 +13,19 @@ export async function GET(request: NextRequest) {
     const limit = Number.isInteger(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 20;
     const cursor = request.nextUrl.searchParams.get('cursor');
     const query = request.nextUrl.searchParams.get('q')?.trim() ?? '';
+    const category = request.nextUrl.searchParams.get('category')?.trim() ?? '';
+    const tag = request.nextUrl.searchParams.get('tag')?.trim() ?? '';
     const posts = await db.post.findMany({
       where: {
         published: true,
+        ...(category ? { category } : {}),
+        ...(tag ? { tags: { has: tag } } : {}),
         ...(query ? { OR: [{ title: { contains: query, mode: 'insensitive' } }, { content: { contains: query, mode: 'insensitive' } }] } : {}),
       },
       orderBy: { createdAt: 'desc' },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      select: { id: true, title: true, content: true, createdAt: true, author: { select: { id: true, displayName: true } } },
+      select: { id: true, title: true, content: true, category: true, tags: true, createdAt: true, author: { select: { id: true, displayName: true } } },
     });
     const hasMore = posts.length > limit;
     const visiblePosts = hasMore ? posts.slice(0, limit) : posts;
