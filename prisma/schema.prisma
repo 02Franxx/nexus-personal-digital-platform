@@ -29,6 +29,7 @@ model User {
   orders       Order[]
   likes        Like[]
   favorites    Favorite[]
+  shares       ShareEvent[]
 
   @@index([createdAt])
 }
@@ -59,6 +60,7 @@ model Post {
   comments  Comment[]
   likes     Like[]
   favorites Favorite[]
+  shares    ShareEvent[]
 
   @@index([authorId, createdAt])
   @@index([published, createdAt])
@@ -99,6 +101,18 @@ model Favorite {
 
   @@unique([userId, postId])
   @@index([userId, createdAt])
+}
+
+model ShareEvent {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String?
+  channel   String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([postId, createdAt])
 }
 
 model Notification {

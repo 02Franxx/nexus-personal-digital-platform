@@ -51,6 +51,10 @@ export const notificationReadSchema = z.object({
   notificationId: z.string().min(1).optional(),
 }).strict();
 
+export const shareSchema = z.object({
+  channel: z.enum(['copy', 'native', 'email', 'social']),
+}).strict();
+
 export const fileMetadataSchema = z.object({
   storageKey: z.string().trim().min(1).max(512).refine((value) => !value.startsWith('/') && !value.includes('\\') && !value.split('/').includes('..'), 'Invalid storage key.'),
   name: z.string().trim().min(1).max(255).refine((value) => !value.includes('/') && !value.includes('\\') && value !== '.' && value !== '..', 'Invalid file name.'),

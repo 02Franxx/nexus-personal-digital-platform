@@ -79,12 +79,19 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
     setFavorited(payload.data.favorited);
   }
 
+  async function sharePost() {
+    const { id } = await params;
+    await navigator.clipboard.writeText(window.location.href);
+    const response = await fetch(`/api/posts/${id}/share`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ channel: 'copy' }) });
+    if (response.ok) setMessage('Post link copied.');
+  }
+
   return (
     <main style={{ maxWidth: 760, margin: '4rem auto', padding: '2rem' }}>
       <p><Link href="/posts">← Back to posts</Link></p>
       {message && !post && <p role="alert">{message}</p>}
       {post && <>
-        <article><h1>{post.title}</h1><p>{post.content}</p><small>By {post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small><div><button type="button" onClick={() => void toggleLike()}>{likeState.liked ? 'Unlike' : 'Like'} · {likeState.count}</button><button type="button" onClick={() => void toggleFavorite()} style={{ marginLeft: '0.5rem' }}>{favorited ? 'Remove favorite' : 'Save post'}</button></div></article>
+        <article><h1>{post.title}</h1><p>{post.content}</p><small>By {post.author.displayName ?? 'NEXUS member'} · {new Date(post.createdAt).toLocaleDateString()}</small><div><button type="button" onClick={() => void toggleLike()}>{likeState.liked ? 'Unlike' : 'Like'} · {likeState.count}</button><button type="button" onClick={() => void toggleFavorite()} style={{ marginLeft: '0.5rem' }}>{favorited ? 'Remove favorite' : 'Save post'}</button><button type="button" onClick={() => void sharePost()} style={{ marginLeft: '0.5rem' }}>Share</button></div></article>
         <section style={{ marginTop: '3rem' }}><h2>Comments</h2>
           {comments.map((comment) => <article key={comment.id} style={{ padding: '1rem 0', borderBottom: '1px solid #ddd' }}><p>{comment.content}</p><small>{comment.author.displayName ?? 'NEXUS member'}</small>{currentUser && (currentUser.role === 'ADMIN' || currentUser.id === comment.author.id) && <button type="button" onClick={() => void deleteComment(comment.id)} style={{ marginLeft: '1rem' }}>Delete</button>}</article>)}
           <form onSubmit={submitComment} style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}><textarea required rows={4} value={content} onChange={(event) => setContent(event.target.value)} placeholder="Write a comment" /><button type="submit" disabled={submitting}>{submitting ? 'Posting…' : 'Comment'}</button></form>
