@@ -1,5 +1,11 @@
 import Dashboard from '../src/Dashboard';
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '../src/lib/auth/session';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
   return <Dashboard />;
 }
