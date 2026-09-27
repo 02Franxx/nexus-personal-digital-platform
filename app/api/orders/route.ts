@@ -24,7 +24,14 @@ export async function POST(request: NextRequest) {
     const user = await getCurrentUser();
     if (!user) return errorResponse(new AppError('UNAUTHORIZED', 'Authentication is required.'));
     const input = orderSchema.parse(await request.json());
-    const order = await db.order.create({ data: { ...input, userId: user.id } });
+    const rawKey = request.headers.get('idempotency-key')?.trim();
+    const idempotencyKey = rawKey && rawKey.length <= 128 ? rawKey : undefined;
+    if (rawKey && !idempotencyKey) return errorResponse(new AppError('BAD_REQUEST', 'Invalid idempotency key.'));
+    if (idempotencyKey) {
+      const existing = await db.order.findFirst({ where: { userId: user.id, idempotencyKey } });
+      if (existing) return NextResponse.json({ data: { order: existing, idempotentReplay: true } });
+    }
+    const order = await db.order.create({ data: { ...input, userId: user.id, idempotencyKey } });
     await Promise.all([
       db.notification.create({ data: { userId: user.id, type: 'ORDER_CREATED', message: `Order ${order.id} was created and is pending payment.` } }),
       recordAuditLog({ action: 'ORDER_CREATED', entity: 'Order', entityId: order.id, userId: user.id }),

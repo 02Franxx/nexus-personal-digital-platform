@@ -165,6 +165,7 @@ model Order {
   id         String      @id @default(cuid())
   totalCents Int
   currency   String      @default("USD")
+  idempotencyKey String?
   status     OrderStatus @default(PENDING)
   userId     String
   createdAt  DateTime    @default(now())
@@ -173,4 +174,5 @@ model Order {
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+  @@unique([userId, idempotencyKey])
 }
