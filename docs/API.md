@@ -26,7 +26,9 @@ HttpOnly `nexus_session` cookie.
 
 ## Product domains
 
-- `GET/POST /api/posts` — public list and authenticated creation.
+- `GET/POST /api/posts` — public list and authenticated creation. `GET` accepts
+  `limit` (1–50, default 20), `cursor`, and `q` (case-insensitive title/body
+  search); paginated responses return `data.nextCursor` or `null`.
 - `GET/PATCH/DELETE /api/posts/:id` — published reads and owner/admin changes.
 - `GET/POST /api/posts/:id/comments` — list and authenticated creation.
 - `GET/PATCH /api/notifications` — current-user notifications and read state.
@@ -52,4 +54,6 @@ flows must not be enabled until an SMTP/provider adapter is configured.
 ## Operational headers
 
 API responses include `X-Request-ID` for correlation. Origins are controlled by
-`NEXUS_ALLOWED_ORIGINS`; secrets are server-only environment variables.
+`NEXUS_ALLOWED_ORIGINS`; secrets are server-only environment variables. API
+responses are marked `Cache-Control: no-store`. Rate-limited responses use
+HTTP `429` and include `Retry-After: 60`.
